@@ -44,6 +44,21 @@ class Trie{
       void insertWord(string word){
         insertUtil(root,word);
     }  
+    string query(string word,TrieNode*&root){
+        TrieNode*curr = root;
+        string s="";
+        for(auto c:word){
+            int index = c-'a';
+            if(curr->children[index]==NULL)return word;
+            curr = curr->children[index];
+            s+=c;
+            if(curr->isTerminal)return s;
+        }
+        return word;
+    }
+    string utilquery(string word){
+        return query(word,root);
+    }
     
     bool searchUtil(TrieNode*root,string word){
         if(word.length()==0){
