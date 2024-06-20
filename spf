@@ -1,0 +1,26 @@
+std::vector<int> sieve_spf(int limit) {
+    std::vector<int> spf(limit + 1);
+    for (int i = 2; i <= limit; ++i) {
+        spf[i] = i;
+    }
+    for (int i = 2; i * i <= limit; ++i) {
+        if (spf[i] == i) {
+            for (int j = i * i; j <= limit; j += i) {
+                if (spf[j] == j) {
+                    spf[j] = i;
+                }
+            }
+        }
+    }
+    return spf;
+}
+
+// Function to find the prime factorization of a given number using the SPF array
+std::vector<int> prime_factorization(int n, const std::vector<int>& spf) {
+    std::vector<int> factors;
+    while (n != 1) {
+        factors.push_back(spf[n]);
+        n /= spf[n];
+    }
+    return factors;
+}
