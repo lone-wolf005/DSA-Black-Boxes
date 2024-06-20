@@ -3,7 +3,7 @@
 using namespace std;
 #define ll long long int
 
-int N = 10e6;
+int N = 1e6;
 vector<bool>isprime(N,true);
 void sieve() {
     isprime[0] = isprime[1] = false;
