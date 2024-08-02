@@ -15,11 +15,11 @@ public:
     }
 
     int find(int x) {
-        if (parent[x] != x) {
-            parent[x] = find(parent[x]); // Path compression
+        if (parent[x] == x) {
+            return x; // Path compression
         }
-        return parent[x];
-    }
+        return parent[x] = find(parent[x]);
+     }
 
     bool unite(int x, int y) {
         int rootX = find(x);
