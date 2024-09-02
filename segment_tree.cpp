@@ -1,65 +1,67 @@
-#include <bits/stdc++.h>
-using namespace std;
-class SGTree{
+class SGT
+{
     public:
-    vector<int>seg;
-     SGTree(int n){
-        seg.resize(4*n + 1);
-     }
+    vector<ll>seg;
+    int n;
 
-     void build(int ind,int low,int high,vector<int>&arr){
-        if(low == high){
+    SGT(int n){
+        seg.resize(4*n+1);
+        this->n = n;
+    }
+    void build(int ind,int low,int high,vector<ll>&arr){
+        if(low==high){
             seg[ind] = arr[low];
             return;
         }
-        int mid = (low+high)/2;
-        build(2*ind+1,low,mid,arr);
-        build(2*ind+2,mid+1,high,arr);
-        seg[ind] = min(seg[2*ind+1],seg[2*ind+2]);
-     }
-     int query(int ind,int low,int high,int l,int r){
-        if(r<low || l > high){
-            return INT_MAX;
+        ll mid = (low+high)/2;
+        build(2*ind,low,mid,arr);
+        build(2*ind+1,mid+1,high,arr);
+        merge(ind);
+    }
+    ll query(int ind,int low,int high,int l,int r){
+        if(r<low || l>high){
+            return LLONG_MAX;
         }
-        else if(low >=l && high <=r){
+        if(low>=l && high<=r){
             return seg[ind];
         }
         else{
-            int mid = (low + high)/ 2;
-            int left = query(2*ind+1,low,mid,l,r);
-            int right = query(2*ind+2,mid+1,high,l,r);
-            return min(left,right);
+            ll mid = (low + high)/2;
+            ll left = query(2*ind,low,mid,l,r);
+            ll right = query(2*ind+1,mid+1,high,l,r);
+            // return left + right;
+            return merge2(left,right);
         }
-     }
-     void update(int ind,int low,int high,int i,int value){
-        if(low == high){
+    }
+    void update(int ind,int low,int high,int i,int value){
+          if(low==high){
             seg[ind] = value;
-            return ;
+            return;
         }
-        int mid = (low + high ) / 2;
+        ll mid = (low+high)/2;
         if(i<=mid){
-            update( 2*ind + 1,low,mid,i,value);
+            update(2*ind,low,mid,i,value);
         }
-        else{
-            update(2*ind + 2,mid+1,high,i,value);
-        }
-        seg[ind] = min(seg[2*ind+1],seg[2*ind+2]);
-     }
+        else update(2*ind+1,mid+1,high,i,value);
+        merge(ind);  
+    }
+    void merge(int ind){
+        //  seg[ind] = seg[2*ind]+seg[2*ind+1];
+         seg[ind] =min(seg[2*ind],seg[2*ind+1]);
+    }
+    ll merge2(ll a,ll b){
+        return min(a,b);
+    }
+    void buildUtil(vector<ll>&arr){
+         build(1,0,n-1,arr);
+    }
+    void updateUtil(int ind,int val){
+        update(1,0,n-1,ind,val);
+        // for(auto x:seg)cout<<x<<" ";
+    }
+    ll queryUtil(int l,int r){
+       return query(1,0,n-1,l,r);
+    }
+
 
 };
-int main(){
-    SGTree sg1(5);
-    vector<int>arr={1,2,3,4,5};
-    sg1.build(0,0,4,arr);
-    cout<<sg1.query(0,0,4,2,4)<<endl;
-
-    // point update
-    // 1 - index
-    // value = 5
-    sg1.update(0,0,4,1,5);
-    arr[1]=5;
-    cout<<sg1.query(0,0,4,1,1)<<endl;
-
-    
-    
-}
