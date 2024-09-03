@@ -1,0 +1,124 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define ll long long int
+
+class SGT {
+public:
+    vector<ll> seg;
+    vector<ll> lazy;
+    int n;
+
+    SGT(int n) {
+        seg.resize(4 * n + 1);
+        lazy.resize(4 * n + 1, 0);
+        this->n = n;
+    }
+
+    void build(int ind, int low, int high, vector<ll>& arr) {
+        if (low == high) {
+            seg[ind] = arr[low];
+            return;
+        }
+        ll mid = (low + high) / 2;
+        build(2 * ind, low, mid, arr);
+        build(2 * ind + 1, mid + 1, high, arr);
+        merge(ind);
+    }
+
+    ll query(int ind, int low, int high, int l, int r) {
+        if (lazy[ind] != 0) {
+            seg[ind] += (high - low + 1) * lazy[ind];
+            if (low != high) {
+                lazy[2 * ind] += lazy[ind];
+                lazy[2 * ind + 1] += lazy[ind];
+            }
+            lazy[ind] = 0;
+        }
+        if (r < low || l > high) {
+            return 0;
+        }
+        if (low >= l && high <= r) {
+            return seg[ind];
+        } else {
+            ll mid = (low + high) / 2;
+            ll left = query(2 * ind, low, mid, l, r);
+            ll right = query(2 * ind + 1, mid + 1, high, l, r);
+            return merge2(left, right);
+        }
+    }
+
+    void update(int ind, int low, int high, int l, int r, int value) {
+        if (lazy[ind] != 0) {
+            seg[ind] += (high - low + 1) * lazy[ind];
+            if (low != high) {
+                lazy[2 * ind] += lazy[ind];
+                lazy[2 * ind + 1] += lazy[ind];
+            }
+            lazy[ind] = 0;
+        }
+        if (r < low || l > high) {
+            return;
+        }
+        if (low >= l && high <= r) {
+            seg[ind] += (high - low + 1) * value;
+            if (low != high) {
+                lazy[2 * ind] += value;
+                lazy[2 * ind + 1] += value;
+            }
+            return;
+        }
+        int mid = (low + high) / 2;
+        update(2 * ind, low, mid, l, r, value);
+        update(2 * ind + 1, mid + 1, high, l, r, value);
+        merge(ind);
+    }
+
+    void merge(int ind) {
+        seg[ind] = seg[2 * ind] + seg[2 * ind + 1];
+    }
+
+    ll merge2(ll a, ll b) {
+        return a + b;
+    }
+
+    void buildUtil(vector<ll>& arr) {
+        build(1, 0, n - 1, arr);
+    }
+
+    void updateUtil(int l, int r, int val) {
+        update(1, 0, n - 1, l, r, val);
+    }
+
+    ll queryUtil(int l, int r) {
+        return query(1, 0, n - 1, l, r);
+    }
+};
+
+void Radhe() {
+    ll n, q;
+    cin >> n >> q;
+    vector<ll> v1(n);
+    for (int i = 0; i < n; i++) cin >> v1[i];
+    SGT sg(n);
+    sg.buildUtil(v1);
+    while (q--) {
+        int i;
+        cin >> i;
+        if (i == 1) {
+            ll l, r, val;
+            cin >> l >> r >> val;
+            sg.updateUtil(l - 1, r - 1, val);
+        } else {
+            int ind;
+            cin >> ind;
+            cout << sg.queryUtil(ind-1, ind-1) << endl;
+        }
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    Radhe();
+    return 0;
+}
